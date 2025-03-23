@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { createTranscriptionSession } from "@/app/lib/actions/transcription/create-session";
-import ChatComponent from "@/app/lib/ui/chat/ChatComponent";
+import ChatComponent from "@/app/lib/ui/chat/chat-component";
 
 export default function GuidedSession() {
   const [transcription, setTranscription] = useState("");

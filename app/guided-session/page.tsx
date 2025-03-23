@@ -1,4 +1,4 @@
-import GuidedSession from "@/app/lib/ui/guided-session/GuidedSession";
+import GuidedSession from "@/app/lib/ui/guided-session/guided-session";
 
 export default function GuidedSessionPage() {
   console.log('[GuidedSessionPage] Rendering page component');
