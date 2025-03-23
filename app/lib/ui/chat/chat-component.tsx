@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 export interface Message {
   role: 'user' | 'assistant';
   content: string;
+  timestamp: Date;
 }
 
 interface ChatComponentProps {
@@ -24,7 +25,7 @@ export default function ChatComponent({ transcription, messages = [] }: ChatComp
   return (
     <div className="h-full flex flex-col">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {/* Show past messages (will be used later) */}
+        {/* Show past messages with timestamps */}
         {messages.map((message, index) => (
           <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`p-3 rounded-lg max-w-[80%] ${
@@ -33,6 +34,9 @@ export default function ChatComponent({ transcription, messages = [] }: ChatComp
                 : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
             }`}>
               <p>{message.content}</p>
+              <p className="text-xs text-gray-500 mt-1">
+                {message.timestamp.toLocaleTimeString()}
+              </p>
             </div>
           </div>
         ))}

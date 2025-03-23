@@ -2,6 +2,7 @@ import { createTranscriptionSession } from "@/app/lib/actions/transcription/crea
 
 export interface TranscriptionEvents {
   onTranscriptionUpdate: (text: string) => void;
+  onTranscriptionCompleted: (fullTranscript: string) => void;
   onError: (message: string) => void;
   onStatusChange: (status: TranscriptionStatus) => void;
 }
@@ -91,6 +92,7 @@ export class TranscriptionService {
           break;
         case "conversation.item.input_audio_transcription.completed":
           console.log(`🟢 [Transcription] Transcription completed: "${message.transcript}"`);
+          this.events.onTranscriptionCompleted(message.transcript);
           this.events.onTranscriptionUpdate(" ");
           break;
         case "input_audio_buffer.speech_started":

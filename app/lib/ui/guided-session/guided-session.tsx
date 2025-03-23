@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import ChatComponent from "@/app/lib/ui/chat/chat-component";
+import ChatComponent, { Message } from "@/app/lib/ui/chat/chat-component";
 import { AudioCaptureService } from "@/app/lib/services/audio-capture";
 import { TranscriptionService, TranscriptionStatus } from "@/app/lib/services/transcription";
 
 export default function GuidedSession() {
   const [transcription, setTranscription] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [allUserMessages, setAllUserMessages] = useState<Message[]>([]); // Store all user messages for LLM call
   const [status, setStatus] = useState<TranscriptionStatus>('idle');
   const [error, setError] = useState<string | null>(null);
   const [audioCapture, setAudioCapture] = useState<AudioCaptureService | null>(null);
@@ -18,6 +20,20 @@ export default function GuidedSession() {
     const newTranscriptionService = new TranscriptionService({
       onTranscriptionUpdate: (text) => {
         setTranscription((prev) => prev + text);
+      },
+      onTranscriptionCompleted: (fullTranscript) => {
+        // Add completed transcription as a new message with timestamp
+        if (fullTranscript && fullTranscript.trim()) {
+          const newMessage = { 
+            role: 'user' as const, 
+            content: fullTranscript.trim(),
+            timestamp: new Date()
+          };
+          
+          setMessages(prev => [...prev, newMessage]);
+          setAllUserMessages(prev => [...prev, newMessage]); // Store for LLM call
+          setTranscription(""); // Clear the transcription for the next speech segment
+        }
       },
       onError: (message) => {
         setError(message);
@@ -62,6 +78,7 @@ export default function GuidedSession() {
   const startSession = async () => {
     console.log("🔷 [GuidedSession] Starting guided session");
     setTranscription("");
+    // Don't clear messages when starting a new session
     setError(null);
     
     if (transcriptionService) {
@@ -85,6 +102,19 @@ export default function GuidedSession() {
   
   const isLoading = status === 'connecting';
   const isSessionActive = status === 'active';
+  
+  // Optional: Add a function to get all user messages for LLM call
+  const getUserMessagesForLLM = () => {
+    return allUserMessages.map(msg => msg.content);
+  };
+
+  const resetSession = () => {
+    setMessages([]);
+    setTranscription("");
+    // Optionally, keep allUserMessages if you need the history for the LLM
+    // or clear it if you want to start fresh:
+    // setAllUserMessages([]);
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -104,6 +134,12 @@ export default function GuidedSession() {
           >
             End Session
           </button>
+          <button
+            onClick={resetSession}
+            className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md ml-2"
+          >
+            Reset Chat
+          </button>
         </div>
         
         {error && (
@@ -114,7 +150,10 @@ export default function GuidedSession() {
       </div>
       
       <div className="flex-1 overflow-hidden">
-        <ChatComponent transcription={transcription} />
+        <ChatComponent 
+          transcription={transcription} 
+          messages={messages}
+        />
       </div>
     </div>
   );
