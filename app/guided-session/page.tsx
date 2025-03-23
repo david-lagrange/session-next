@@ -1,5 +1,4 @@
-// Import the GuidedSession component
-import GuidedSession from '../lib/ui/guided-session/guided-session';
+import GuidedSession from "@/app/lib/ui/guided-session/GuidedSession";
 
 export default function GuidedSessionPage() {
   console.log('[GuidedSessionPage] Rendering page component');
@@ -14,6 +13,7 @@ export default function GuidedSessionPage() {
   return (
     <div className="guided-session-page p-4 h-[calc(100vh-4rem)]">
       <h1 className="text-2xl font-bold mb-6 text-center">Guided Session</h1>
+      
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 h-[calc(100%-4rem)]">
         <GuidedSession />
       </div>
